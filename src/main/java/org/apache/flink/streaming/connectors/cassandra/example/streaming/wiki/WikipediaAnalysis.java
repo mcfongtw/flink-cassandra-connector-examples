@@ -23,7 +23,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * A wikipedia-connector provides means to retrieves all edits to the wiki. In this example, we will stream all edit
+ * record to Flink and count the number of bytes that each user edits within a given window of time
  *
+ * <p>This example shows how to:
+ * <ul>
+ * <li>use POJO data types,
+ * <li>write timeWindow and fold functions,
+ * <li>write POJO result back to C* sink
+ * </ul>
  */
 public class WikipediaAnalysis {
 
