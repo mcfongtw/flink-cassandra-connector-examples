@@ -29,9 +29,8 @@ import org.slf4j.LoggerFactory;
  *
  * <p>This example shows how to:
  * <ul>
- * <li>write a simple Flink Streaming program,
  * <li>use tuple data types,
- * <li>write and use user-defined functions.
+ * <li>write flatMap, keyBy and sum functions
  * <li>write tuple result back to C* sink
  * </ul>
  */
