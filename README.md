@@ -16,7 +16,7 @@ Here is the quick overview for each examples
 | Name          | Computation Type | Data Type  |  CQL Entity   |
 | ------------- |:----------------:| :---------:| :------------: |
 | WikiAnalysis  | Streaming        | POJO       | WikiEditRecord |
-| FileWordCount | Streaming        | Tuple      | WordCount      |
+| FileWordCount | Streaming        | POJO       | WordCount      |
 
 ### Description
 
@@ -26,7 +26,7 @@ This example utilizes POJO data type to perform the stream computation and store
 
 #### FileWordCount
 A re-implementation of the "WordCount" program that computes a simple word occurrence histogram over text files in a streaming fashion.
-This example utilizes Tuple data type to perform the stream computation and store the result back to C* with CQL entity `WordCount`
+This example utilizes POJO data type to perform the stream computation and store the result back to C* with CQL entity `WordCount`
 
 ## Common Services
 ### Embedded Cassandra Service

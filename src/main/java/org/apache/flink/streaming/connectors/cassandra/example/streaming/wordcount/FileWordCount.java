@@ -5,10 +5,11 @@
 package org.apache.flink.streaming.connectors.cassandra.example.streaming.wordcount;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.cassandra.CassandraSink;
 import org.apache.flink.streaming.connectors.cassandra.ClusterBuilder;
 import org.apache.flink.streaming.connectors.cassandra.example.datamodel.DataModelServiceFacade;
@@ -29,9 +30,8 @@ import org.slf4j.LoggerFactory;
  *
  * <p>This example shows how to:
  * <ul>
- * <li>write a simple Flink Streaming program,
  * <li>use tuple data types,
- * <li>write and use user-defined functions.
+ * <li>write flatMap, keyBy and reduce functions,
  * <li>write tuple result back to C* sink
  * </ul>
  */
@@ -56,17 +56,17 @@ public class FileWordCount {
 		@Override
 		protected void initDataModel() {
 			clientSession.execute("CREATE KEYSPACE IF NOT EXISTS " + WordCount.CQL_KEYSPACE_NAME +
-                    " WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}" +
-                    ";");
+					" WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}" +
+					";");
 			LOG.info("Keyspace [{}] created", WordCount.CQL_KEYSPACE_NAME);
 
 			clientSession.execute("CREATE TABLE IF NOT EXISTS " + WordCount.CQL_KEYSPACE_NAME + "." + WordCount.CQL_TABLE_NAME +
-                    "(" +
-                    "word text, " +
-                    "count bigint, " +
-                    "PRIMARY KEY(word)" +
-                    ")" +
-                    ";");
+					"(" +
+					"word text, " +
+					"count bigint, " +
+					"PRIMARY KEY(word)" +
+					")" +
+					";");
 
 			LOG.info("Table [{}] created", WordCount.CQL_TABLE_NAME);
 		}
@@ -100,42 +100,38 @@ public class FileWordCount {
 
 		LOG.info("Example starts!");
 
-		// get input data by connecting to the socket
+		// get input data by reading content from file
 		DataStream<String> text = job.readTextFile(inputPath);
 
-		DataStream<Tuple2<String, Long>> counts =
-			// split up the lines in pairs (2-tuples) containing: (word,1)
-			text.flatMap(new FlatMapFunction<String, Tuple2<String, Long>>() {
-
-				@Override
-				public void flatMap(String value, Collector<Tuple2<String, Long>> out) throws Exception {
-					// normalize and split the line
-					String[] words = value.toLowerCase().split("\\W+");
-
-					// emit the pairs
-					for (String word : words) {
-					    //Do not accept empty word, since word is defined as primary key in C* table
-						if (!word.isEmpty()) {
-							out.collect(new Tuple2<String, Long>(word, 1L));
+		// parse the data, group it, window it, and aggregate the counts
+		DataStream<WordCount> counts = text
+				.flatMap(new FlatMapFunction<String, WordCount>() {
+					@Override
+					public void flatMap(String value, Collector<WordCount> out) {
+						for (String word : value.split("\\s")) {
+							out.collect(new WordCount(word, 1L));
 						}
 					}
-				}
-			})
-				// group by the tuple field "0" and sum up tuple field "1"
-				.keyBy(0)
-				.sum(1);
+				})
+
+				.keyBy("word")
+
+				.reduce(new ReduceFunction<WordCount>() {
+					@Override
+					public WordCount reduce(WordCount a, WordCount b) {
+						return new WordCount(a.getWord(), a.getCount() + b.getCount());
+					}
+				});
 
 		//Update the results to C* sink
-        CassandraSink.addSink(counts)
-                .setQuery("INSERT INTO " + WordCount.CQL_KEYSPACE_NAME + "." + WordCount.CQL_TABLE_NAME + "(word, count) " +
-                        "values (?, ?);")
-                .setClusterBuilder(new ClusterBuilder() {
-                    @Override
-                    protected Cluster buildCluster(Cluster.Builder builder) {
-                        return builder.addContactPoint("127.0.0.1").build();
-                    }
-                })
-                .build();
+		CassandraSink.addSink(counts)
+				.setClusterBuilder(new ClusterBuilder() {
+					@Override
+					protected Cluster buildCluster(Cluster.Builder builder) {
+						return builder.addContactPoint("127.0.0.1").build();
+					}
+				})
+				.build();
 
 		// emit result
 		if (outputPath != null) {
@@ -145,11 +141,11 @@ public class FileWordCount {
 			counts.print();
 		}
 
-        // execute program
-        job.execute("FileWordCount w/ C* Sink and WordCount");
+		// execute program
+		job.execute("FileWordCount w/ C* Sink and WordCount");
 
 		LOG.info("20 sec sleep ...");
-		Thread.sleep(20 * 1000);
-        LOG.info("20 sec sleep ... DONE");
+		Thread.sleep(30 * 1000);
+		LOG.info("20 sec sleep ... DONE");
 	}
 }
