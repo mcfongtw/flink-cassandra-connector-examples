@@ -11,6 +11,7 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.QueryOptions;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.policies.ConstantReconnectionPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,27 +24,42 @@ public abstract class DataModelServiceFacade {
 
 	private EmbeddedCassandraService cassandra = new EmbeddedCassandraService();
 
+	private static final int RECONNECT_DELAY_IN_MS = 100;
+
 	protected Cluster.Builder clientClusterBuilder;
 
 	protected Cluster clientCluster;
 
 	protected Session clientSession;
 
-	public DataModelServiceFacade(String address) {
-		clientClusterBuilder = new Cluster.Builder().addContactPoint(address).withQueryOptions(new QueryOptions()
-			.setConsistencyLevel(ConsistencyLevel.ONE).setSerialConsistencyLevel(ConsistencyLevel.LOCAL_SERIAL))
-			.withoutJMXReporting()
-			.withoutMetrics();
+	protected boolean isEmbeddedCassandra;
+
+	public DataModelServiceFacade() {
+	    this(true, "127.0.0.1");
+    }
+
+	public DataModelServiceFacade(boolean isEmbedded, String address) {
+		clientClusterBuilder = new Cluster.Builder()
+                .addContactPoint(address)
+                .withQueryOptions(new QueryOptions()
+                        .setConsistencyLevel(ConsistencyLevel.ONE)
+                        .setSerialConsistencyLevel(ConsistencyLevel.LOCAL_SERIAL))
+                .withoutJMXReporting()
+                .withoutMetrics()
+                .withReconnectionPolicy(new ConstantReconnectionPolicy(RECONNECT_DELAY_IN_MS));
+		isEmbeddedCassandra = isEmbedded;
 	}
 
 	public void setUp() throws Exception {
-		LOG.info("Bringing up Embedded Cassandra service");
-
-		cassandra.start();
+	    if(isEmbeddedCassandra) {
+            LOG.info("Bringing up Embedded Cassandra service ... ");
+            cassandra.start();
+            LOG.info("Bringing up Embedded Cassandra service ... DONE");
+        }
 
 		initClientSession();
 
-		addShutdownHook();
+        addClientShutdownHook();
 
 		initDataModel();
 	}
@@ -51,30 +67,14 @@ public abstract class DataModelServiceFacade {
 	private void initClientSession() throws Exception {
 		Preconditions.checkNotNull(clientClusterBuilder, "Client Cluster Builder");
 
-		// start establishing a connection within 30 seconds
 		long startTimeInMillis = System.currentTimeMillis();
-		long maxWaitInMillis = 30 * 1000;
-		do {
-			try {
-				clientCluster = clientClusterBuilder.build();
-				clientSession = clientCluster.connect();
-				break;
-			} catch (Exception e) {
-				long elapsedTimeInMillis = System.currentTimeMillis() - startTimeInMillis;
-				if (elapsedTimeInMillis > maxWaitInMillis) {
-					throw e;
-				}
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException ignored) {
-				}
-			}
-		} while(true);
+        clientCluster = clientClusterBuilder.build();
+        clientSession = clientCluster.connect();
 
-		LOG.info("Client session established after {}ms.", System.currentTimeMillis() - startTimeInMillis);
+		LOG.info("Client session established after {} ms.", System.currentTimeMillis() - startTimeInMillis);
 	}
 
-	public void addShutdownHook() {
+	private void addClientShutdownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread(){
 			public void run() {
 				if (clientSession != null) {
@@ -83,10 +83,6 @@ public abstract class DataModelServiceFacade {
 
 				if (clientCluster != null) {
 					clientCluster.close();
-				}
-
-				if (cassandra != null) {
-					cassandra.stop();
 				}
 			}
 		});

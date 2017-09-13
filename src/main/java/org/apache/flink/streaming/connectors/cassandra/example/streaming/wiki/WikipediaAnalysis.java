@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
  * </ul>
  */
 public class WikipediaAnalysis {
-
 	private static final Logger LOG = LoggerFactory.getLogger(WikipediaAnalysis.class);
 
 	private static final boolean IS_EMBEDDED_CASSANDRA = true;
@@ -42,11 +41,11 @@ public class WikipediaAnalysis {
 	private static class WikiEditRecordDataModel extends DataModelServiceFacade {
 
 		public WikiEditRecordDataModel() {
-			super("127.0.0.1");
+			super(IS_EMBEDDED_CASSANDRA, "127.0.0.1");
 		}
 
 		public WikiEditRecordDataModel(String address) {
-			super(IS_EMBEDDED_CASSANDRA ? "127.0.0.1" : address);
+			super(IS_EMBEDDED_CASSANDRA, address);
 		}
 
 		@Override
@@ -118,6 +117,6 @@ public class WikipediaAnalysis {
 
 		result.print();
 
-		job.execute();
+		job.execute("WikiAnalysis w/ C* Sink");
 	}
 }

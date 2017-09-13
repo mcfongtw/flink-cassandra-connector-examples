@@ -35,21 +35,18 @@ import org.slf4j.LoggerFactory;
  * </ul>
  */
 public class FileWordCount {
-
 	private static final Logger LOG = LoggerFactory.getLogger(FileWordCount.class);
-
-	private static final long serialVersionUID = 1038054554690916991L;
 
 	private static final boolean IS_EMBEDDED_CASSANDRA = true;
 
 	private static class WordCountDataModel extends DataModelServiceFacade {
 
 		public WordCountDataModel() {
-			super("127.0.0.1");
+			super(IS_EMBEDDED_CASSANDRA, "127.0.0.1");
 		}
 
 		public WordCountDataModel(String address) {
-			super(IS_EMBEDDED_CASSANDRA ? "127.0.0.1" : address);
+			super(IS_EMBEDDED_CASSANDRA,  address);
 		}
 
 		@Override
@@ -145,7 +142,7 @@ public class FileWordCount {
 		}
 
         // execute program
-        job.execute("FileWordCount w/ C* Sink and WordCount");
+        job.execute("FileWordCount w/ C* Sink");
 
 		LOG.info("20 sec sleep ...");
 		Thread.sleep(20 * 1000);

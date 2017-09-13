@@ -42,6 +42,8 @@ public class EmbeddedCassandraService {
 
 	private CountDownLatch startUpLatch = new CountDownLatch(1);
 
+	private static final boolean SELF_MANAGED_LIFECYCLE = true;
+
 	public EmbeddedCassandraService() {
 
 	}
@@ -51,7 +53,8 @@ public class EmbeddedCassandraService {
 			@Override
 			public void run() {
 				try {
-					CassandraDaemon cassandraDaemon = new CassandraDaemon();
+				    //Set this false or default will make C* daemon to System.exit(0) in incomplete state.
+					CassandraDaemon cassandraDaemon = new CassandraDaemon(SELF_MANAGED_LIFECYCLE);
 					initConfig();
 					//NOTE: Use the following 2 method for C* 2.x would hang the main thread?
 //					cassandraDaemon.completeSetup();
@@ -93,15 +96,10 @@ public class EmbeddedCassandraService {
 				if (tmpDir != null) {
 					//noinspection ResultOfMethodCallIgnored
 					tmpDir.delete();
+					LOG.info("Temp Cassandra storage deleted");
 				}
-
-				LOG.info("Temp Cassandra storage deleted");
 			}
 		});
-	}
-
-	public void stop() {
-
 	}
 
 	private void initConfig() throws IOException {
