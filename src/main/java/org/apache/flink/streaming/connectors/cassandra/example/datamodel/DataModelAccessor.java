@@ -11,7 +11,7 @@ import com.datastax.driver.mapping.annotations.Accessor;
  *
  */
 @Accessor
-public interface DataModelAccessor {
+public interface DataModelAccessor<M> {
 
-	Result<?> findAll();
+	Result<M> findAll(int max);
 }

@@ -71,10 +71,10 @@ public class WikiEditRecord {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("User: " + getUser() + ", ");
-		builder.append("Time: " + getTime() + ", ");
-		builder.append("Title: " + getTitle() + ", ");
-		builder.append("Diff: " + getDiff() + " bytes");
+		builder.append("User: " + getUser() + "\t | ");
+		builder.append("Time: " + getTime() + "\t | ");
+		builder.append("Title: " + getTitle() + "\t | ");
+		builder.append("Diff: " + getDiff() + " bytes|");
 		return builder.toString();
 	}
 }

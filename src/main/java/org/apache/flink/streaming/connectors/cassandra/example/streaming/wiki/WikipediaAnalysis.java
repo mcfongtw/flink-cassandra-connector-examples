@@ -12,7 +12,9 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.cassandra.CassandraSink;
 import org.apache.flink.streaming.connectors.cassandra.ClusterBuilder;
+import org.apache.flink.streaming.connectors.cassandra.example.streaming.CQLPrintSinkFunction;
 import org.apache.flink.streaming.connectors.cassandra.example.datamodel.DataModelServiceFacade;
+import org.apache.flink.streaming.connectors.cassandra.example.datamodel.accessor.WikiEditRecordAccessor;
 import org.apache.flink.streaming.connectors.cassandra.example.datamodel.pojo.WikiEditRecord;
 import org.apache.flink.streaming.connectors.wikiedits.WikipediaEditEvent;
 import org.apache.flink.streaming.connectors.wikiedits.WikipediaEditsSource;
@@ -38,14 +40,20 @@ public class WikipediaAnalysis {
 
 	private static final boolean IS_EMBEDDED_CASSANDRA = true;
 
-	private static class WikiEditRecordDataModel extends DataModelServiceFacade {
+	private static class WikiEditRecordDataModel extends DataModelServiceFacade<WikiEditRecord> {
+
+		private static final long serialVersionUID = 1L;
 
 		public WikiEditRecordDataModel() {
-			super(IS_EMBEDDED_CASSANDRA, "127.0.0.1");
+			this("127.0.0.1");
 		}
 
 		public WikiEditRecordDataModel(String address) {
-			super(IS_EMBEDDED_CASSANDRA, address);
+			this(IS_EMBEDDED_CASSANDRA, address);
+		}
+
+		public WikiEditRecordDataModel(boolean isEmbedded, String address) {
+			super(isEmbedded, address, WikiEditRecordAccessor.class);
 		}
 
 		@Override
@@ -72,9 +80,8 @@ public class WikipediaAnalysis {
 
 		WikiEditRecordDataModel dataModel = new WikiEditRecordDataModel();
 
-		if (IS_EMBEDDED_CASSANDRA) {
-			dataModel.setUp();
-		}
+		dataModel.setUpEmbeddedCassandra();
+		dataModel.setUpDataModel();
 
 		LOG.info("Example starts!");
 
@@ -115,7 +122,9 @@ public class WikipediaAnalysis {
 			})
 			.build();
 
-		result.print();
+		CQLPrintSinkFunction<WikiEditRecord, WikiEditRecord> func = new CQLPrintSinkFunction();
+		func.setDataModel(dataModel, 10);
+		result.addSink(func).setParallelism(1);
 
 		job.execute("WikiAnalysis w/ C* Sink");
 	}
