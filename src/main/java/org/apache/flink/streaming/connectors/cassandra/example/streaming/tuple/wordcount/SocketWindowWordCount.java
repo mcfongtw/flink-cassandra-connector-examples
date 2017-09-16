@@ -9,6 +9,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.cassandra.CassandraSink;
 import org.apache.flink.streaming.connectors.cassandra.example.datamodel.DataModelServiceFacade;
 import org.apache.flink.streaming.connectors.cassandra.example.datamodel.accessor.WordCountAccessor;
@@ -20,22 +21,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implements the "WordCount" program that computes a simple word occurrence
- * histogram over text files in a streaming fashion.
+ * Implements a streaming windowed version of the "WordCount" program, processing Tuple data type.
  *
- * <p>The input is a plain text file with lines separated by newline characters.
- *
- * <p>Usage: <code>WordCount --input &lt;path&gt; --output &lt;path&gt;</code><br>
- *
- * <p>This example shows how to:
- * <ul>
- * <li>use tuple data types,
- * <li>write flatMap, keyBy and sum functions
- * <li>write tuple result back to C* sink
- * </ul>
+ * <p>This program connects to a server socket and reads strings from the socket.
+ * The easiest way to try this out is to open a text server (at port 12345)
+ * using the <i>netcat</i> tool via
+ * <pre>
+ * nc -l 12345
+ * </pre>
+ * and run this example with the hostname and the port as arguments.
  */
-public class FileWordCount {
-	private static final Logger LOG = LoggerFactory.getLogger(FileWordCount.class);
+@SuppressWarnings("serial")
+public class SocketWindowWordCount {
+	private static final Logger LOG = LoggerFactory.getLogger(SocketWindowWordCount.class);
 
 	private static final boolean IS_EMBEDDED_CASSANDRA = true;
 
@@ -76,21 +74,19 @@ public class FileWordCount {
 
 	public static void main(String[] args) throws Exception {
 
-		// get the execution environment
-		final StreamExecutionEnvironment job = StreamExecutionEnvironment.getExecutionEnvironment();
-		String inputPath, outputPath = null;
+		// the host and the port to connect to
+		final String hostname;
+		final int port;
 		try {
 			final ParameterTool params = ParameterTool.fromArgs(args);
-			inputPath = params.get("input");
-
-			if (params.has("output")) {
-				outputPath = params.get("output");
-			}
-			// make parameters available in the web interface
-			job.getConfig().setGlobalJobParameters(params);
+			hostname = params.has("hostname") ? params.get("hostname") : "localhost";
+			port = params.getInt("port");
 		} catch (Exception e) {
-			System.err.println("No input specified. Please run '" + FileWordCount.class.getSimpleName() +
-				"--input <file-path>', where 'input' is the path to a text file");
+			System.err.println("No port specified. Please run 'SocketWindowWordCount " +
+					"--hostname <hostname> --port <port>', where hostname (localhost by default) " +
+					"and port is the address of the text server");
+			System.err.println("To start a simple text server, run 'netcat -l <port>' and " +
+					"type the input text into the command line");
 			return;
 		}
 
@@ -99,56 +95,46 @@ public class FileWordCount {
 		dataModel.setUpEmbeddedCassandra();
 		dataModel.setUpDataModel();
 
-		LOG.info("Example starts!");
+		// get the execution environment
+		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-		// get input data by reading content from file
-		DataStream<String> text = job.readTextFile(inputPath);
+		// get input data by connecting to the socket
+		DataStream<String> text = env.socketTextStream(hostname, port, "\n");
 
-		DataStream<Tuple2<String, Long>> result =
-			// split up the lines in pairs (2-tuples) containing: (word,1)
-			text.flatMap(new FlatMapFunction<String, Tuple2<String, Long>>() {
+		// parse the data, group it, window it, and aggregate the counts
+		DataStream<Tuple2<String, Long>> result = text
 
-				@Override
-				public void flatMap(String value, Collector<Tuple2<String, Long>> out) throws Exception {
-					// normalize and split the line
-					String[] words = value.toLowerCase().split("\\W+");
+				.flatMap(new FlatMapFunction<String, Tuple2<String, Long>>() {
+					@Override
+					public void flatMap(String value, Collector<Tuple2<String, Long>> out) {
+						// normalize and split the line
+						String[] words = value.toLowerCase().split("\\W+");
 
-					// emit the pairs
-					for (String word : words) {
-						//Do not accept empty word, since word is defined as primary key in C* table
-						if (!word.isEmpty()) {
-							out.collect(new Tuple2<String, Long>(word, 1L));
+						// emit the pairs
+						for (String word : words) {
+							//Do not accept empty word, since word is defined as primary key in C* table
+							if (!word.isEmpty()) {
+								out.collect(new Tuple2<String, Long>(word, 1L));
+							}
 						}
 					}
-				}
-			})
-				// group by the tuple field "0" and sum up tuple field "1"
-				.keyBy(0)
-				.sum(1);
+				})
 
-		//Update the results to C* sink
+				.keyBy(0)
+				.timeWindow(Time.seconds(5))
+				.sum(1)
+				;
+
 		CassandraSink.addSink(result)
 				.setQuery("INSERT INTO " + WordCount.CQL_KEYSPACE_NAME + "." + WordCount.CQL_TABLE_NAME + "(word, count) " +
 						"values (?, ?);")
 				.setHost("127.0.0.1")
 				.build();
 
-		// emit result
-		if (outputPath != null) {
-			result.writeAsText(outputPath);
-		} else {
-			System.out.println("Printing result to stdout. Use --output to specify output path.");
+		CQLPrintSinkFunction<Tuple2<String, Long>, WordCount> func = new CQLPrintSinkFunction();
+		func.setDataModel(dataModel, 10);
+		result.addSink(func).setParallelism(1);
 
-			CQLPrintSinkFunction<Tuple2<String, Long>, WordCount> func = new CQLPrintSinkFunction();
-			func.setDataModel(dataModel, 10);
-			result.addSink(func).setParallelism(1);
-		}
-
-		// execute program
-		job.execute("FileWordCount w/ C* Sink");
-
-		LOG.info("20 sec sleep ...");
-		Thread.sleep(20 * 1000);
-		LOG.info("20 sec sleep ... DONE");
+		env.execute("Socket Window WordCount (Tuple) w/ C* Sink");
 	}
 }

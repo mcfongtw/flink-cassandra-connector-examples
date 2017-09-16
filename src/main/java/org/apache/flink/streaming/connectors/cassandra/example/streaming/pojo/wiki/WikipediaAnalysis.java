@@ -11,15 +11,13 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.cassandra.CassandraSink;
-import org.apache.flink.streaming.connectors.cassandra.ClusterBuilder;
-import org.apache.flink.streaming.connectors.cassandra.example.streaming.CQLPrintSinkFunction;
 import org.apache.flink.streaming.connectors.cassandra.example.datamodel.DataModelServiceFacade;
 import org.apache.flink.streaming.connectors.cassandra.example.datamodel.accessor.WikiEditRecordAccessor;
 import org.apache.flink.streaming.connectors.cassandra.example.datamodel.pojo.WikiEditRecord;
+import org.apache.flink.streaming.connectors.cassandra.example.streaming.CQLPrintSinkFunction;
 import org.apache.flink.streaming.connectors.wikiedits.WikipediaEditEvent;
 import org.apache.flink.streaming.connectors.wikiedits.WikipediaEditsSource;
 
-import com.datastax.driver.core.Cluster;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,13 +112,8 @@ public class WikipediaAnalysis {
 			});
 
 		CassandraSink.addSink(result)
-			.setClusterBuilder(new ClusterBuilder() {
-				@Override
-				protected Cluster buildCluster(Cluster.Builder builder) {
-					return builder.addContactPoint("127.0.0.1").build();
-				}
-			})
-			.build();
+				.setHost("127.0.0.1")
+				.build();
 
 		CQLPrintSinkFunction<WikiEditRecord, WikiEditRecord> func = new CQLPrintSinkFunction();
 		func.setDataModel(dataModel, 10);

@@ -13,10 +13,12 @@ A short description of the motivation behind the creation and maintenance of the
 ### Examples Overview
 Here is the quick overview for each examples
 
-| Name          | Computation Type | Data Type  |  CQL Entity   |
-| ------------- |:----------------:| :---------:| :------------: |
-| WikiAnalysis  | Streaming        | POJO       | WikiEditRecord |
-| FileWordCount | Streaming        | Tuple      | WordCount      |
+| Name                  | Computation Type | Data Type  |  CQL Entity    |
+| --------------------- |:----------------:| :---------:| :------------: |
+| WikiAnalysis          | Streaming        | POJO       | WikiEditRecord |
+| FileWordCount         | Streaming        | Tuple      | WordCount      |
+| SocketWindowWordCount | Streaming        | POJO       | WordCount      |
+| SocketWindowWordCount | Streaming        | Tuple      | WordCount      |
 
 ### Description
 
@@ -31,6 +33,13 @@ This example utilizes POJO data type to perform the stream computation and store
 
 A re-implementation of the "WordCount" program that computes a simple word occurrence histogram over text files in a streaming fashion.
 This example utilizes Tuple data type to perform the stream computation and store the result back to C* with CQL entity `WordCount`
+
+#### SocketWindowWordCount
+`org.apache.flink.streaming.connectors.cassandra.example.streaming.pojo.wordcount.SocketWindowWordCount` or
+`org.apache.flink.streaming.connectors.cassandra.example.streaming.tuple.wordcount.SocketWindowWordCount`
+
+An re-implementation to connects to a server socket, reads strings from the socket, perform word count against the text recieved and finally store the result back to C* with CQL entity `WikiEditRecord`. Two implementations exists, one for streaming over tuple data type and the other for POJO type.
+
 
 ## Common Services
 ### Embedded Cassandra Service
