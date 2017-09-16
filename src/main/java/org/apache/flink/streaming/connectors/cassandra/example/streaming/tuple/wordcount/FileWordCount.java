@@ -2,7 +2,7 @@
  * PUT COPYRIGHT DISCLAIMER / LICENSE HERE
  */
 
-package org.apache.flink.streaming.connectors.cassandra.example.streaming.wordcount;
+package org.apache.flink.streaming.connectors.cassandra.example.streaming.tuple.wordcount;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -103,7 +103,7 @@ public class FileWordCount {
 
 		LOG.info("Example starts!");
 
-		// get input data by connecting to the socket
+		// get input data by reading content from file
 		DataStream<String> text = job.readTextFile(inputPath);
 
 		DataStream<Tuple2<String, Long>> result =

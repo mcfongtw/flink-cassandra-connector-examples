@@ -386,7 +386,7 @@ under the License.
 						</goals>
 						<configuration>
 							<!-- Set the shaded output executable jar file name -->
-							<outputFile>target/${project.artifactId}-stream-wiki-analysis-${project.version}.jar</outputFile>
+							<outputFile>target/${project.artifactId}-stream-pojo-wiki-analysis-${project.version}.jar</outputFile>
 							<artifactSet>
 								<excludes>
 									<!-- This list contains all dependencies of flink-dist
@@ -489,7 +489,7 @@ under the License.
 							<transformers>
 								<!-- Build a uber executable jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>org.apache.flink.streaming.connectors.cassandra.example.streaming.wiki.WikipediaAnalysis</mainClass>
+									<mainClass>org.apache.flink.streaming.connectors.cassandra.example.streaming.pojo.wiki.WikipediaAnalysis</mainClass>
 								</transformer>
 								<!-- Include resource files in uber jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
@@ -510,7 +510,7 @@ under the License.
 						</goals>
 						<configuration>
 							<!-- Set the shaded output executable jar file name -->
-							<outputFile>target/${project.artifactId}-stream-file-word-count-${project.version}.jar</outputFile>
+							<outputFile>target/${project.artifactId}-stream-tuple-file-word-count-${project.version}.jar</outputFile>
 							<artifactSet>
 								<excludes>
 									<!-- This list contains all dependencies of flink-dist
@@ -613,7 +613,7 @@ under the License.
 							<transformers>
 								<!-- Build a uber executable jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>org.apache.flink.streaming.connectors.cassandra.example.streaming.wordcount.FileWordCount</mainClass>
+									<mainClass>org.apache.flink.streaming.connectors.cassandra.example.streaming.tuple.wordcount.FileWordCount</mainClass>
 								</transformer>
 								<!-- Include resource files in uber jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">

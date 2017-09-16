@@ -21,10 +21,14 @@ Here is the quick overview for each examples
 ### Description
 
 #### WikiAnalysis
+`org.apache.flink.streaming.connectors.cassandra.example.streaming.pojo.wiki.WikiAnalysis`
+
 An implementation to stream all edited record from Wikipedia to Flink and count the number of bytes that each user edits within a given window of time
 This example utilizes POJO data type to perform the stream computation and store the result back to C* with CQL entity `WikiEditRecord`
 
 #### FileWordCount
+`org.apache.flink.streaming.connectors.cassandra.example.streaming.tuple.wordcount.FileWordCount`
+
 A re-implementation of the "WordCount" program that computes a simple word occurrence histogram over text files in a streaming fashion.
 This example utilizes Tuple data type to perform the stream computation and store the result back to C* with CQL entity `WordCount`
 

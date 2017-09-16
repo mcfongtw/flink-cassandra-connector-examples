@@ -2,7 +2,7 @@
  * PUT COPYRIGHT DISCLAIMER / LICENSE HERE
  */
 
-package org.apache.flink.streaming.connectors.cassandra.example.streaming.wiki;
+package org.apache.flink.streaming.connectors.cassandra.example.streaming.pojo.wiki;
 
 import org.apache.flink.api.common.functions.FoldFunction;
 import org.apache.flink.api.java.functions.KeySelector;
