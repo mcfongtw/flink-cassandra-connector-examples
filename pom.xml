@@ -489,7 +489,7 @@ under the License.
 							<transformers>
 								<!-- Build a uber executable jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>org.apache.flink.streaming.connectors.cassandra.example.streaming.pojo.wiki.WikipediaAnalysis</mainClass>
+									<mainClass>org.apache.flink.connectors.cassandra.streaming.pojo.wiki.WikipediaAnalysis</mainClass>
 								</transformer>
 								<!-- Include resource files in uber jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
@@ -613,7 +613,7 @@ under the License.
 							<transformers>
 								<!-- Build a uber executable jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>org.apache.flink.streaming.connectors.cassandra.example.streaming.tuple.wordcount.FileWordCount</mainClass>
+									<mainClass>org.apache.flink.connectors.cassandra.streaming.tuple.wordcount.FileWordCount</mainClass>
 								</transformer>
 								<!-- Include resource files in uber jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
@@ -737,7 +737,7 @@ under the License.
 							<transformers>
 								<!-- Build a uber executable jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>org.apache.flink.streaming.connectors.cassandra.example.streaming.pojo.wordcount.SocketWindowWordCount</mainClass>
+									<mainClass>org.apache.flink.connectors.cassandra.streaming.pojo.wordcount.SocketWindowWordCount</mainClass>
 								</transformer>
 								<!-- Include resource files in uber jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
@@ -861,7 +861,7 @@ under the License.
                             <transformers>
                                 <!-- Build a uber executable jar -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.apache.flink.streaming.connectors.cassandra.example.streaming.tuple.wordcount.SocketWindowWordCount</mainClass>
+                                    <mainClass>org.apache.flink.connectors.cassandra.streaming.tuple.wordcount.SocketWindowWordCount</mainClass>
                                 </transformer>
                                 <!-- Include resource files in uber jar -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
@@ -985,7 +985,7 @@ under the License.
 							<transformers>
 								<!-- Build a uber executable jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>org.apache.flink.streaming.connectors.cassandra.scala.examples.streaming.pojo.wordcount.SocketWindowWordCount</mainClass>
+									<mainClass>org.apache.flink.connectors.cassandra.scala.streaming.tuple.wordcount.SocketWindowWordCount</mainClass>
 								</transformer>
 								<!-- Include resource files in uber jar -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">

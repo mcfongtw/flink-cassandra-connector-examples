@@ -7,8 +7,8 @@ Any comments, feedback or _pull requests_ are welcome!
 A short description of the motivation behind the creation and maintenance of the project. As this project was created, as of Flink version 1.4.0, there are plenty streaming examples and a few simple C* connector examples. However, there are currently no concrete examples that demonstrates on storing streaming results to C* using `flink-connector-cassandra` library.
 
 ## Included Examples
-1. The streaming examples could be found at `org.apache.flink.streaming.connectors.cassandra.example.streaming`.
-2. The associated CQL entity mapping is located at `org.apache.flink.streaming.connectors.cassandra.example.datamodel`
+1. The streaming examples could be found at `org.apache.flink.connectors.cassandra.streaming`.
+2. The associated CQL entity mapping is located at `org.apache.flink.connectors.cassandra.datamodel`
 
 ### Examples Overview
 Here is the quick overview for each examples
@@ -16,31 +16,31 @@ Here is the quick overview for each examples
 | Name                  | Language Type    | Data Type  |  CQL Entity    |
 | --------------------- |:----------------:| :---------:| :------------: |
 | WikiAnalysis          | Java             | POJO       | WikiEditRecord |
-| FileWordCount         | Java             | Tuple      | WordCount      |
+| FileWordCount         | Java             | Java Tuple | WordCount      |
 | SocketWindowWordCount | Java             | POJO       | WordCount      |
-| SocketWindowWordCount | Java             | Tuple      | WordCount      |
-| SocketWindowWordCount | Scala            | Tuple      | WordCount      |
+| SocketWindowWordCount | Java             | Java Tuple | WordCount      |
+| SocketWindowWordCount | Scala            | Scala Tuple| WordCount      |
 
 ### Description
 
 #### WikiAnalysis
-`org.apache.flink.streaming.connectors.cassandra.example.streaming.pojo.wiki.WikiAnalysis`
+`org.apache.flink.connectors.cassandra.streaming.pojo.wiki.WikiAnalysis`
 
 An implementation to stream all edited record from Wikipedia to Flink and count the number of bytes that each user edits within a given window of time
 This example utilizes POJO data type to perform the stream computation and store the result back to C* with CQL entity `WikiEditRecord`
 
 #### FileWordCount
-`org.apache.flink.streaming.connectors.cassandra.example.streaming.tuple.wordcount.FileWordCount`
+`org.apache.flink.connectors.cassandra.streaming.tuple.wordcount.FileWordCount`
 
 A re-implementation of the "WordCount" program that computes a simple word occurrence histogram over text files in a streaming fashion.
 This example utilizes Tuple data type to perform the stream computation and store the result back to C* with CQL entity `WordCount`
 
 #### SocketWindowWordCount
-1. Java Pojo example: `org.apache.flink.streaming.connectors.cassandra.example.streaming.pojo.wordcount.SocketWindowWordCount`
-2. Java Tuple example: `org.apache.flink.streaming.connectors.cassandra.example.streaming.tuple.wordcount.SocketWindowWordCount`
-3. Scala Tuple example: `org.apache.flink.streaming.connectors.cassandra.scala.examples.streaming.pojo.wordcount.SocketWindowWordCount`
+1. Java Pojo example: `org.apache.flink.connectors.cassandra.streaming.pojo.wordcount.SocketWindowWordCount`
+2. Java Tuple example: `org.apache.flink.connectors.cassandra.streaming.tuple.wordcount.SocketWindowWordCount`
+3. Scala Tuple example: `org.apache.flink.connectors.cassandra.scala.streaming.tuple.wordcount.SocketWindowWordCount`
 
-An re-implementation to connects to a server socket, reads strings from the socket, perform word count against the text recieved and finally store the result back to C* with CQL entity `WikiEditRecord`. Two implementations exists, one for streaming over tuple data type and the other for POJO type.
+An re-implementation to connects to a server socket, reads strings from the socket, perform word count against the text recieved and finally store the result back to C* with CQL entity `WikiEditRecord`. Several implementations exists, some for streaming over Java/Scala tuple data type, and the others for Java POJO type.
 
 
 ## Common Services
