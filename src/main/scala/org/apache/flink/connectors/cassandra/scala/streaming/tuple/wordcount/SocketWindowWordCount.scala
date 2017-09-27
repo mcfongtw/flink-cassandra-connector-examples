@@ -5,9 +5,8 @@
 package org.apache.flink.connectors.cassandra.scala.streaming.tuple.wordcount
 
 import org.apache.flink.api.java.utils.ParameterTool
-import org.apache.flink.connectors.cassandra.datamodel.WordCountDataModel
+import org.apache.flink.connectors.cassandra.datamodel.{DataEntityType, DataServiceFacade}
 import org.apache.flink.connectors.cassandra.datamodel.pojo.WordCount
-import org.apache.flink.connectors.cassandra.datamodel.WordCountDataModel
 import org.apache.flink.streaming.connectors.cassandra.CassandraSink
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.time.Time
@@ -46,11 +45,10 @@ object SocketWindowWordCount {
         return
       }
     }
+    val dataService = new DataServiceFacade(DataEntityType.WORD_COUNT)
 
-    val dataModel = new WordCountDataModel()
-
-    dataModel.setUpEmbeddedCassandra()
-    dataModel.setUpDataModel()
+    dataService.setUpEmbeddedCassandra()
+    dataService.setUpDataModel()
 
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
 

@@ -7,12 +7,13 @@ package org.apache.flink.connectors.cassandra.streaming.tuple.wordcount;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.connectors.cassandra.datamodel.DataEntityType;
+import org.apache.flink.connectors.cassandra.datamodel.DataServiceFacade;
 import org.apache.flink.connectors.cassandra.streaming.CQLPrintSinkFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.cassandra.CassandraSink;
-import org.apache.flink.connectors.cassandra.datamodel.WordCountDataModel;
 import org.apache.flink.connectors.cassandra.datamodel.pojo.WordCount;
 import org.apache.flink.util.Collector;
 
@@ -52,10 +53,10 @@ public class SocketWindowWordCount {
 			return;
 		}
 
-		WordCountDataModel dataModel = new WordCountDataModel();
+		DataServiceFacade dataService = new DataServiceFacade(DataEntityType.WORD_COUNT);
 
-		dataModel.setUpEmbeddedCassandra();
-		dataModel.setUpDataModel();
+		dataService.setUpEmbeddedCassandra();
+		dataService.setUpDataModel();
 
 		// get the execution environment
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -94,7 +95,7 @@ public class SocketWindowWordCount {
 				.build();
 
 		CQLPrintSinkFunction<Tuple2<String, Long>, WordCount> func = new CQLPrintSinkFunction();
-		func.setDataModel(dataModel, 10);
+		func.setDataModel(dataService, 10);
 		result.addSink(func).setParallelism(1);
 
 		env.execute("Socket Window WordCount (Tuple) w/ C* Sink");

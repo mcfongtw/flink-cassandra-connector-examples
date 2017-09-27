@@ -13,22 +13,14 @@ import org.slf4j.LoggerFactory;
 /**
  *
  */
-public class WordCountDataModel extends DataModelServiceFacade<WordCount> {
+public class WordCountDataModel extends AbstractDataModel<WordCount> {
 
     private static final Logger LOG = LoggerFactory.getLogger(WordCountDataModel.class);
 
     private static final long serialVersionUID = 1L;
 
-    public WordCountDataModel(String address) {
-        this(true, address);
-    }
-
     public WordCountDataModel() {
-        this("127.0.0.1");
-    }
-
-    public WordCountDataModel(boolean isEmbedded, String address) {
-        super(isEmbedded, address, WordCountAccessor.class);
+        super(WordCountAccessor.class);
     }
 
     @Override

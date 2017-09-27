@@ -13,21 +13,13 @@ import org.slf4j.LoggerFactory;
 /**
  *
  */
-public class WikiEditRecordDataModel extends DataModelServiceFacade<WikiEditRecord> {
+public class WikiEditRecordDataModel extends AbstractDataModel<WikiEditRecord> {
     private static final Logger LOG = LoggerFactory.getLogger(WikiEditRecordDataModel.class);
 
     private static final long serialVersionUID = 1L;
 
     public WikiEditRecordDataModel() {
-        this("127.0.0.1");
-    }
-
-    public WikiEditRecordDataModel(String address) {
-        this(true, address);
-    }
-
-    public WikiEditRecordDataModel(boolean isEmbedded, String address) {
-        super(isEmbedded, address, WikiEditRecordAccessor.class);
+        super(WikiEditRecordAccessor.class);
     }
 
     @Override

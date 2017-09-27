@@ -6,8 +6,9 @@ package org.apache.flink.connectors.cassandra.streaming.pojo.wiki;
 
 import org.apache.flink.api.common.functions.FoldFunction;
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.connectors.cassandra.datamodel.DataEntityType;
+import org.apache.flink.connectors.cassandra.datamodel.DataServiceFacade;
 import org.apache.flink.connectors.cassandra.datamodel.pojo.WikiEditRecord;
-import org.apache.flink.connectors.cassandra.datamodel.WikiEditRecordDataModel;
 import org.apache.flink.connectors.cassandra.streaming.CQLPrintSinkFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -37,10 +38,10 @@ public class WikipediaAnalysis {
 
 	public static void main(String[] args) throws Exception {
 
-		WikiEditRecordDataModel dataModel = new WikiEditRecordDataModel();
+		DataServiceFacade dataService = new DataServiceFacade(DataEntityType.WIKI_EDIT_RECORD);
 
-		dataModel.setUpEmbeddedCassandra();
-		dataModel.setUpDataModel();
+		dataService.setUpEmbeddedCassandra();
+		dataService.setUpDataModel();
 
 		LOG.info("Example starts!");
 
@@ -77,7 +78,7 @@ public class WikipediaAnalysis {
 				.build();
 
 		CQLPrintSinkFunction<WikiEditRecord, WikiEditRecord> func = new CQLPrintSinkFunction();
-		func.setDataModel(dataModel, 10);
+		func.setDataModel(dataService, 10);
 		result.addSink(func).setParallelism(1);
 
 		job.execute("WikiAnalysis w/ C* Sink");

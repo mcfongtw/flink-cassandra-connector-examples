@@ -7,7 +7,7 @@ package org.apache.flink.connectors.cassandra.streaming;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.apache.flink.streaming.api.operators.StreamingRuntimeContext;
-import org.apache.flink.connectors.cassandra.datamodel.DataModelServiceFacade;
+import org.apache.flink.connectors.cassandra.datamodel.DataServiceFacade;
 import org.apache.flink.util.Preconditions;
 
 import com.datastax.driver.mapping.Result;
@@ -33,7 +33,7 @@ public class CQLPrintSinkFunction<IN, M> extends RichSinkFunction<IN>  {
 
 	private int selectLimit;
 
-	private DataModelServiceFacade<M> dataModelService;
+	private DataServiceFacade dataModelService;
 	/**
 	 * Instantiates a print sink function that prints to standard out.
 	 */
@@ -50,8 +50,8 @@ public class CQLPrintSinkFunction<IN, M> extends RichSinkFunction<IN>  {
 		target = stdErr;
 	}
 
-	public void setDataModel(DataModelServiceFacade dataModel, int limit) {
-		dataModelService = dataModel;
+	public void setDataModel(DataServiceFacade dataService, int limit) {
+		dataModelService = dataService;
 		selectLimit = limit;
 	}
 
@@ -89,7 +89,7 @@ public class CQLPrintSinkFunction<IN, M> extends RichSinkFunction<IN>  {
 	private String getAllResultSet() {
 		Preconditions.checkNotNull(dataModelService, "Data Model Service!");
 
-		Result<M> results = dataModelService.getDataModelAccessor().findAll(selectLimit);
+		Result<M> results = dataModelService.getDataModel().getAccessor().findAll(selectLimit);
 		StringBuilder sb = new StringBuilder();
 		sb.append("-----------------------------------------------\r\n");
 		for (M entity : results) {
