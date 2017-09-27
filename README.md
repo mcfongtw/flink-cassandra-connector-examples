@@ -13,12 +13,13 @@ A short description of the motivation behind the creation and maintenance of the
 ### Examples Overview
 Here is the quick overview for each examples
 
-| Name                  | Computation Type | Data Type  |  CQL Entity    |
+| Name                  | Language Type    | Data Type  |  CQL Entity    |
 | --------------------- |:----------------:| :---------:| :------------: |
-| WikiAnalysis          | Streaming        | POJO       | WikiEditRecord |
-| FileWordCount         | Streaming        | Tuple      | WordCount      |
-| SocketWindowWordCount | Streaming        | POJO       | WordCount      |
-| SocketWindowWordCount | Streaming        | Tuple      | WordCount      |
+| WikiAnalysis          | Java             | POJO       | WikiEditRecord |
+| FileWordCount         | Java             | Tuple      | WordCount      |
+| SocketWindowWordCount | Java             | POJO       | WordCount      |
+| SocketWindowWordCount | Java             | Tuple      | WordCount      |
+| SocketWindowWordCount | Scala            | Tuple      | WordCount      |
 
 ### Description
 
@@ -35,8 +36,9 @@ A re-implementation of the "WordCount" program that computes a simple word occur
 This example utilizes Tuple data type to perform the stream computation and store the result back to C* with CQL entity `WordCount`
 
 #### SocketWindowWordCount
-`org.apache.flink.streaming.connectors.cassandra.example.streaming.pojo.wordcount.SocketWindowWordCount` or
-`org.apache.flink.streaming.connectors.cassandra.example.streaming.tuple.wordcount.SocketWindowWordCount`
+1. Java Pojo example: `org.apache.flink.streaming.connectors.cassandra.example.streaming.pojo.wordcount.SocketWindowWordCount`
+2. Java Tuple example: `org.apache.flink.streaming.connectors.cassandra.example.streaming.tuple.wordcount.SocketWindowWordCount`
+3. Scala Tuple example: `org.apache.flink.streaming.connectors.cassandra.scala.examples.streaming.pojo.wordcount.SocketWindowWordCount`
 
 An re-implementation to connects to a server socket, reads strings from the socket, perform word count against the text recieved and finally store the result back to C* with CQL entity `WikiEditRecord`. Two implementations exists, one for streaming over tuple data type and the other for POJO type.
 
