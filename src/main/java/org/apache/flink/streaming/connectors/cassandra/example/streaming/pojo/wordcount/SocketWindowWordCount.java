@@ -34,8 +34,6 @@ import org.slf4j.LoggerFactory;
 public class SocketWindowWordCount {
 	private static final Logger LOG = LoggerFactory.getLogger(SocketWindowWordCount.class);
 
-	private static final boolean IS_EMBEDDED_CASSANDRA = true;
-
 	public static void main(String[] args) throws Exception {
 
 		// the host and the port to connect to

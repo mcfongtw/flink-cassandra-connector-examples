@@ -11,8 +11,7 @@ import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.cassandra.CassandraSink;
-import org.apache.flink.streaming.connectors.cassandra.example.datamodel.DataModelServiceFacade;
-import org.apache.flink.streaming.connectors.cassandra.example.datamodel.accessor.WikiEditRecordAccessor;
+import org.apache.flink.streaming.connectors.cassandra.example.datamodel.WikiEditRecordDataModel;
 import org.apache.flink.streaming.connectors.cassandra.example.datamodel.pojo.WikiEditRecord;
 import org.apache.flink.streaming.connectors.cassandra.example.streaming.CQLPrintSinkFunction;
 import org.apache.flink.streaming.connectors.wikiedits.WikipediaEditEvent;
@@ -35,44 +34,6 @@ import org.slf4j.LoggerFactory;
  */
 public class WikipediaAnalysis {
 	private static final Logger LOG = LoggerFactory.getLogger(WikipediaAnalysis.class);
-
-	private static final boolean IS_EMBEDDED_CASSANDRA = true;
-
-	private static class WikiEditRecordDataModel extends DataModelServiceFacade<WikiEditRecord> {
-
-		private static final long serialVersionUID = 1L;
-
-		public WikiEditRecordDataModel() {
-			this("127.0.0.1");
-		}
-
-		public WikiEditRecordDataModel(String address) {
-			this(IS_EMBEDDED_CASSANDRA, address);
-		}
-
-		public WikiEditRecordDataModel(boolean isEmbedded, String address) {
-			super(isEmbedded, address, WikiEditRecordAccessor.class);
-		}
-
-		@Override
-		protected void initDataModel() {
-			clientSession.execute("CREATE KEYSPACE IF NOT EXISTS " + WikiEditRecord.CQL_KEYSPACE_NAME + " " +
-				"WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}" +
-				";");
-			LOG.info("Keyspace [{}] created", WikiEditRecord.CQL_KEYSPACE_NAME);
-
-			clientSession.execute("CREATE TABLE IF NOT EXISTS " + WikiEditRecord.CQL_KEYSPACE_NAME + "." + WikiEditRecord.CQL_TABLE_NAME +
-				"(" +
-				"user text, " +
-				"time text, " +
-				"diff bigint," +
-				"title text," +
-				"PRIMARY KEY(user, time)" +
-				") WITH CLUSTERING ORDER BY (time DESC)" +
-				";");
-			LOG.info("Table [{}] created", WikiEditRecord.CQL_TABLE_NAME);
-		}
-	}
 
 	public static void main(String[] args) throws Exception {
 
