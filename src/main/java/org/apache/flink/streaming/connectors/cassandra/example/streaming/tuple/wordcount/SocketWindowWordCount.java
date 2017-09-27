@@ -11,8 +11,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.cassandra.CassandraSink;
-import org.apache.flink.streaming.connectors.cassandra.example.datamodel.DataModelServiceFacade;
-import org.apache.flink.streaming.connectors.cassandra.example.datamodel.accessor.WordCountAccessor;
+import org.apache.flink.streaming.connectors.cassandra.example.datamodel.WordCountDataModel;
 import org.apache.flink.streaming.connectors.cassandra.example.datamodel.pojo.WordCount;
 import org.apache.flink.streaming.connectors.cassandra.example.streaming.CQLPrintSinkFunction;
 import org.apache.flink.util.Collector;
@@ -34,43 +33,6 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 public class SocketWindowWordCount {
 	private static final Logger LOG = LoggerFactory.getLogger(SocketWindowWordCount.class);
-
-	private static final boolean IS_EMBEDDED_CASSANDRA = true;
-
-	private static class WordCountDataModel extends DataModelServiceFacade<WordCount> {
-
-		private static final long serialVersionUID = 1L;
-
-		public WordCountDataModel() {
-			this("127.0.0.1");
-		}
-
-		public WordCountDataModel(String address) {
-			this(IS_EMBEDDED_CASSANDRA, address);
-		}
-
-		public WordCountDataModel(boolean isEmbedded, String address) {
-			super(isEmbedded, address, WordCountAccessor.class);
-		}
-
-		@Override
-		protected void initDataModel() {
-			clientSession.execute("CREATE KEYSPACE IF NOT EXISTS " + WordCount.CQL_KEYSPACE_NAME +
-					" WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}" +
-					";");
-			LOG.info("Keyspace [{}] created", WordCount.CQL_KEYSPACE_NAME);
-
-			clientSession.execute("CREATE TABLE IF NOT EXISTS " + WordCount.CQL_KEYSPACE_NAME + "." + WordCount.CQL_TABLE_NAME +
-					"(" +
-					"word text, " +
-					"count bigint, " +
-					"PRIMARY KEY(word)" +
-					")" +
-					";");
-
-			LOG.info("Table [{}] created", WordCount.CQL_TABLE_NAME);
-		}
-	}
 
 	public static void main(String[] args) throws Exception {
 
@@ -108,7 +70,7 @@ public class SocketWindowWordCount {
 					@Override
 					public void flatMap(String value, Collector<Tuple2<String, Long>> out) {
 						// normalize and split the line
-						String[] words = value.toLowerCase().split("\\W+");
+						String[] words = value.toLowerCase().split("\\s");
 
 						// emit the pairs
 						for (String word : words) {
