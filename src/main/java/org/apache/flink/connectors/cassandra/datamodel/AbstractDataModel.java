@@ -77,5 +77,7 @@ public abstract class AbstractDataModel<M> implements Serializable {
         });
     }
 
+    //TODO: https://stackoverflow.com/questions/44950245/generate-a-script-to-create-a-table-from-the-entity-definition/45073242#45073242
+    //Java-Driver > 3.x to use MappedProperty
     protected abstract void initDataModel();
 }

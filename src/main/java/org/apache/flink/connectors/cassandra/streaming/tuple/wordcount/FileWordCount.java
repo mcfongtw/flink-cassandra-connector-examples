@@ -108,10 +108,6 @@ public class FileWordCount {
 		}
 
 		// execute program
-		job.execute("FileWordCount w/ C* Sink");
-
-		LOG.info("20 sec sleep ...");
-		Thread.sleep(20 * 1000);
-		LOG.info("20 sec sleep ... DONE");
+		job.execute("[STREAM] FileWordCount w/ C* Sink");
 	}
 }

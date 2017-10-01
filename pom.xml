@@ -624,6 +624,130 @@ under the License.
 						</configuration>
 					</execution>
 
+					<!-- [BATCH][Tuple] FileWordCount -->
+					<execution>
+						<!-- unique id for each example -->
+						<id>batch-tuple-file-word-count</id>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<!-- Set the shaded output executable jar file name -->
+							<outputFile>target/${project.artifactId}-batch-tuple-file-word-count-${project.version}.jar</outputFile>
+							<artifactSet>
+								<excludes>
+									<!-- This list contains all dependencies of flink-dist
+									Everything else will be packaged into the fat-jar
+									-->
+									<exclude>org.apache.flink:flink-annotations</exclude>
+									<exclude>org.apache.flink:flink-shaded-hadoop2</exclude>
+									<exclude>org.apache.flink:flink-shaded-curator-recipes</exclude>
+									<exclude>org.apache.flink:flink-core</exclude>
+									<exclude>org.apache.flink:flink-java</exclude>
+									<exclude>org.apache.flink:flink-scala_${scala.binary.version}</exclude>
+									<exclude>org.apache.flink:flink-runtime_${scala.binary.version}</exclude>
+									<exclude>org.apache.flink:flink-optimizer_${scala.binary.version}</exclude>
+									<exclude>org.apache.flink:flink-clients_${scala.binary.version}</exclude>
+									<exclude>org.apache.flink:flink-avro_${scala.binary.version}</exclude>
+									<exclude>org.apache.flink:flink-examples-batch_${scala.binary.version}</exclude>
+									<exclude>org.apache.flink:flink-examples-streaming_${scala.binary.version}</exclude>
+									<exclude>org.apache.flink:flink-streaming-java_${scala.binary.version}</exclude>
+									<exclude>org.apache.flink:flink-streaming-scala_${scala.binary.version}</exclude>
+									<exclude>org.apache.flink:flink-scala-shell_${scala.binary.version}</exclude>
+									<exclude>org.apache.flink:flink-python</exclude>
+									<exclude>org.apache.flink:flink-metrics-core</exclude>
+									<exclude>org.apache.flink:flink-metrics-jmx</exclude>
+									<exclude>org.apache.flink:flink-statebackend-rocksdb_${scala.binary.version}</exclude>
+
+									<!-- Also exclude very big transitive dependencies of Flink
+
+									WARNING: You have to remove these excludes if your code relies on other
+									versions of these dependencies.
+
+									-->
+
+									<exclude>log4j:log4j</exclude>
+									<exclude>org.scala-lang:scala-library</exclude>
+									<exclude>org.scala-lang:scala-compiler</exclude>
+									<exclude>org.scala-lang:scala-reflect</exclude>
+									<exclude>com.data-artisans:flakka-actor_*</exclude>
+									<exclude>com.data-artisans:flakka-remote_*</exclude>
+									<exclude>com.data-artisans:flakka-slf4j_*</exclude>
+									<!-- NOTE: Do not exclude netty since embedded C* depends on it -->
+									<!--<exclude>io.netty:netty-all</exclude>-->
+									<!--<exclude>io.netty:netty</exclude>-->
+									<exclude>commons-fileupload:commons-fileupload</exclude>
+									<exclude>org.apache.avro:avro</exclude>
+									<exclude>commons-collections:commons-collections</exclude>
+									<exclude>org.codehaus.jackson:jackson-core-asl</exclude>
+									<exclude>org.codehaus.jackson:jackson-mapper-asl</exclude>
+									<exclude>com.thoughtworks.paranamer:paranamer</exclude>
+									<exclude>org.xerial.snappy:snappy-java</exclude>
+									<exclude>org.apache.commons:commons-compress</exclude>
+									<exclude>org.tukaani:xz</exclude>
+									<exclude>com.esotericsoftware.kryo:kryo</exclude>
+									<exclude>com.esotericsoftware.minlog:minlog</exclude>
+									<exclude>org.objenesis:objenesis</exclude>
+									<exclude>com.twitter:chill_*</exclude>
+									<exclude>com.twitter:chill-java</exclude>
+									<exclude>commons-lang:commons-lang</exclude>
+									<exclude>junit:junit</exclude>
+									<exclude>org.apache.commons:commons-lang3</exclude>
+									<exclude>org.slf4j:slf4j-api</exclude>
+									<exclude>org.slf4j:slf4j-log4j12</exclude>
+									<exclude>log4j:log4j</exclude>
+									<exclude>org.apache.commons:commons-math</exclude>
+									<exclude>org.apache.sling:org.apache.sling.commons.json</exclude>
+									<exclude>commons-logging:commons-logging</exclude>
+									<exclude>commons-codec:commons-codec</exclude>
+									<exclude>com.fasterxml.jackson.core:jackson-core</exclude>
+									<exclude>com.fasterxml.jackson.core:jackson-databind</exclude>
+									<exclude>com.fasterxml.jackson.core:jackson-annotations</exclude>
+									<exclude>stax:stax-api</exclude>
+									<exclude>com.typesafe:config</exclude>
+									<exclude>org.uncommons.maths:uncommons-maths</exclude>
+									<exclude>com.github.scopt:scopt_*</exclude>
+									<exclude>commons-io:commons-io</exclude>
+									<exclude>commons-cli:commons-cli</exclude>
+								</excludes>
+							</artifactSet>
+							<filters>
+								<filter>
+									<artifact>org.apache.flink:*</artifact>
+									<excludes>
+										<!-- exclude shaded google but include shaded curator -->
+										<exclude>org/apache/flink/shaded/com/**</exclude>
+										<exclude>web-docs/**</exclude>
+									</excludes>
+								</filter>
+								<filter>
+									<!-- Do not copy the signatures in the META-INF folder.
+									Otherwise, this might cause SecurityExceptions when using the JAR. -->
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+							<!-- If you want to use ./bin/flink run <quickstart jar> uncomment the following lines.
+							This will add a Main-Class entry to the manifest file -->
+							<transformers>
+								<!-- Build a uber executable jar -->
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>org.apache.flink.connectors.cassandra.batch.tuple.wordcount.FileWordCount</mainClass>
+								</transformer>
+								<!-- Include resource files in uber jar -->
+								<transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+									<resource>cassandra.yaml</resource>
+								</transformer>
+							</transformers>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+						</configuration>
+					</execution>
+
 					<!-- [STREAM][POJO] SocketWindowWordCount -->
 					<execution>
 						<!-- unique id for each example -->

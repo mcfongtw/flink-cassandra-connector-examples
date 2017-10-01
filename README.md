@@ -13,13 +13,14 @@ A short description of the motivation behind the creation and maintenance of the
 ### Examples Overview
 Here is the quick overview for each examples
 
-| Name                  | Language Type    | Data Type  |  CQL Entity    |
-| --------------------- |:----------------:| :---------:| :------------: |
-| WikiAnalysis          | Java             | POJO       | WikiEditRecord |
-| FileWordCount         | Java             | Java Tuple | WordCount      |
-| SocketWindowWordCount | Java             | POJO       | WordCount      |
-| SocketWindowWordCount | Java             | Java Tuple | WordCount      |
-| SocketWindowWordCount | Scala            | Scala Tuple| WordCount      |
+| Name                  | Language Type    | Computation Type | Data Type  |  CQL Entity    |
+| --------------------- |:----------------:| :--------------: | :---------:| :------------: |
+| WikiAnalysis          | Java             | Streaming        | POJO       | WikiEditRecord |
+| FileWordCount         | Java             | Streaming        | Java Tuple | WordCount      |
+| FileWordCount         | Java             | Batch            | Java Tuple | WordCount      |
+| SocketWindowWordCount | Java             | Streaming        | POJO       | WordCount      |
+| SocketWindowWordCount | Java             | Streaming        | Java Tuple | WordCount      |
+| SocketWindowWordCount | Scala            | Streaming        | Scala Tuple| WordCount      |
 
 ### Description
 
@@ -30,7 +31,8 @@ An implementation to stream all edited record from Wikipedia to Flink and count 
 This example utilizes POJO data type to perform the stream computation and store the result back to C* with CQL entity `WikiEditRecord`
 
 #### FileWordCount
-`org.apache.flink.connectors.cassandra.streaming.tuple.wordcount.FileWordCount`
+1. Streaming example: `org.apache.flink.connectors.cassandra.streaming.tuple.wordcount.FileWordCount`
+2. Batch example: `org.apache.flink.connectors.cassandra.batch.tuple.wordcount.FileWordCount`
 
 A re-implementation of the "WordCount" program that computes a simple word occurrence histogram over text files in a streaming fashion.
 This example utilizes Tuple data type to perform the stream computation and store the result back to C* with CQL entity `WordCount`
