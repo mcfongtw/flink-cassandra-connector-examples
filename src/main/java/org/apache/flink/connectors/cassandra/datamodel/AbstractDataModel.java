@@ -4,6 +4,7 @@
 
 package org.apache.flink.connectors.cassandra.datamodel;
 
+import org.apache.flink.connectors.cassandra.datamodel.accessor.DataModelAccessor;
 import org.apache.flink.util.Preconditions;
 
 import com.datastax.driver.core.Session;

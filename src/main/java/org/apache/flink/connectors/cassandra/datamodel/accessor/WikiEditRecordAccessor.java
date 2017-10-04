@@ -4,7 +4,6 @@
 
 package org.apache.flink.connectors.cassandra.datamodel.accessor;
 
-import org.apache.flink.connectors.cassandra.datamodel.DataModelAccessor;
 import org.apache.flink.connectors.cassandra.datamodel.pojo.WikiEditRecord;
 
 import com.datastax.driver.mapping.Result;

@@ -2,7 +2,7 @@
  * PUT COPYRIGHT DISCLAIMER / LICENSE HERE
  */
 
-package org.apache.flink.connectors.cassandra.datamodel;
+package org.apache.flink.connectors.cassandra.datamodel.accessor;
 
 import com.datastax.driver.mapping.Result;
 import com.datastax.driver.mapping.annotations.Accessor;

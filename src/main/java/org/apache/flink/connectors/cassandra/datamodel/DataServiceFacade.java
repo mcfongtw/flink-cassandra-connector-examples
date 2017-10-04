@@ -5,6 +5,7 @@
 package org.apache.flink.connectors.cassandra.datamodel;
 
 import org.apache.flink.connectors.cassandra.EmbeddedCassandraService;
+import org.apache.flink.connectors.cassandra.datamodel.factory.SimpleDataModelFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,16 +31,13 @@ public class DataServiceFacade implements Serializable {
 	 */
 	private transient EmbeddedCassandraService cassandra = new EmbeddedCassandraService();
 
-
-	protected Class<? extends DataModelAccessor> accessorClass;
-
     public DataServiceFacade(DataEntityType entityType) {
-        this(true, LOCALHOST_ADDR, entityType);
+        this(true, entityType);
     }
 
-	public DataServiceFacade(boolean isEmbedded, String dbAddr, DataEntityType entityType) {
+	public DataServiceFacade(boolean isEmbedded, DataEntityType entityType) {
 		isEmbeddedCassandra = isEmbedded;
-		dataModel = DataModelFactory.getDataModel(dbAddr, entityType);
+		dataModel = SimpleDataModelFactory.getDataModel(entityType);
 	}
 
 	public void setUpEmbeddedCassandra() throws Exception {
