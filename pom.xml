@@ -32,7 +32,7 @@ under the License.
 		<cassandra.version>2.2.5</cassandra.version>
 		<driver.version>3.0.0</driver.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<flink.version>1.4-SNAPSHOT</flink.version>
+		<flink.version>1.4.0</flink.version>
 		<slf4j.version>1.7.7</slf4j.version>
 		<log4j.version>1.2.17</log4j.version>
 		<scala.binary.version>2.11</scala.binary.version>
