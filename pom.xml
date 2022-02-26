@@ -29,7 +29,7 @@ under the License.
 
 	<properties>
 		<!-- Allow users to pass custom connector versions -->
-		<cassandra.version>2.2.5</cassandra.version>
+		<cassandra.version>3.0.26</cassandra.version>
 		<driver.version>3.0.0</driver.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<flink.version>1.8.1</flink.version>
